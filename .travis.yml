@@ -6,21 +6,28 @@ rust:
   - stable
   - beta
   - nightly
-script:
-  - RUSTFLAGS='-F warnings' cargo build --verbose --all
-  - RUSTFLAGS='-F warnings' cargo test --verbose --all
+# script:
+  # - RUSTFLAGS='-F warnings' cargo build --verbose --all
+  # - RUSTFLAGS='-F warnings' cargo test --verbose --all
 stages:
-  - Check
-  - Test
+  # - Check
+  # - Test
+  - Deploy
 jobs:
   include:
-    - stage: Check
-      name: Format
+    # - stage: Check
+    #   name: Format
+    #   script:
+    #     - rustup component add rustfmt
+    #     - cargo fmt --all -- --check
+    # - stage: Check
+    #   name: Clippy
+    #   script:
+    #     - rustup component add clippy
+    #     - RUSTFLAGS='-F warnings' cargo clippy --all --all-targets --all-features
+    - stage: Deploy
+      # if: branch = debug
+      name: Deploy
       script:
-        - rustup component add rustfmt
-        - cargo fmt --all -- --check
-    - stage: Check
-      name: Clippy
-      script:
-        - rustup component add clippy
-        - RUSTFLAGS='-F warnings' cargo clippy --all --all-targets --all-features
+        - cargo clean
+        - cargo publish --token "${CARGO_PUBLISH_TOKEN}" && echo "Publish is DONE." || echo "Failed to publish."
